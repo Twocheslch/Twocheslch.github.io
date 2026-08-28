@@ -1,1 +1,1 @@
-link: bishopsmedia.com
+link: https://bishopsmedia.com/
