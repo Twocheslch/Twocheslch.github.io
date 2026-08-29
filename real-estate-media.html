@@ -62,7 +62,7 @@
 
   <main id="main-content">
     <section class="page-hero" aria-label="Real estate media hero">
-      <video class="page-hero-image page-hero-video real-estate-rotate-left" autoplay muted playsinline loop preload="metadata" poster="images/real-estate-media.jpg" aria-label="Real estate media by Bishops Media">
+      <video class="page-hero-image page-hero-video real-estate-rotate-left" data-loop-start="6" autoplay muted playsinline preload="metadata" poster="images/real-estate-media.jpg" aria-label="Real estate media by Bishops Media">
         <source src="videos/Final_560_3.webm" type="video/webm" />
       </video>
       <div class="page-hero-overlay"></div>
@@ -222,5 +222,49 @@
       <a href="#main-content">Back to top</a>
     </div>
   </footer>
+
+  <script>
+    (() => {
+      const heroVideo = document.querySelector('[data-loop-start]');
+
+      if (!heroVideo) return;
+
+      const loopStart = Number(heroVideo.dataset.loopStart) || 0;
+
+      function setStartTime() {
+        if (Number.isFinite(heroVideo.duration) && heroVideo.duration > loopStart) {
+          heroVideo.currentTime = loopStart;
+        }
+      }
+
+      function playFromStart() {
+        setStartTime();
+        const playPromise = heroVideo.play();
+
+        if (playPromise && typeof playPromise.catch === 'function') {
+          playPromise.catch(() => {});
+        }
+      }
+
+      if (heroVideo.readyState >= 1) {
+        playFromStart();
+      } else {
+        heroVideo.addEventListener('loadedmetadata', playFromStart, { once: true });
+      }
+
+      heroVideo.addEventListener('timeupdate', () => {
+        if (
+          Number.isFinite(heroVideo.duration) &&
+          heroVideo.duration > loopStart &&
+          heroVideo.currentTime >= heroVideo.duration - 0.2
+        ) {
+          playFromStart();
+        }
+      });
+
+      heroVideo.addEventListener('ended', playFromStart);
+    })();
+  </script>
+
 </body>
 </html>
